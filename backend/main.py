@@ -22,7 +22,7 @@ def get_books_read(shelf):
         title = book.select_one('.field.title > div > a').attrs['title']
         author = book.select_one('.field.author > div > a').text
         rating = book.find_all('span', class_='staticStar p10')
-        review = book.select_one('.field.review > div > span').text
+        review = book.select('.field.review > div > span')[-1].get_text(' ')
         date_read = book.select_one(
             '.field.date_read > div > div > div > span').text.strip()
         date_added = book.select_one(
