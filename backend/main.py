@@ -1,4 +1,5 @@
 from bottle import route, run, template
+from requests.api import request
 from config import LIST_URL, DETAIL_URL
 import requests
 from bs4 import BeautifulSoup
@@ -81,6 +82,20 @@ def get_book_details(book_id):
         'genres': genres,
         'pages': pages,
     })
+
+
+@route('/shelves')
+def get_shelves():
+    page = requests.get(LIST_URL)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    shelves = [dict({
+        'name': x.select_one('a').text.split(' ‎(')[0].strip(),
+        'slug': x.select_one('a').attrs['href'].split('shelf=')[-1],
+        'total': int(x.select_one('a').text.split(' ‎(')[-1].strip().replace(')', ''))
+    }) for x in soup.find_all('div', class_='userShelf')]
+
+    return json.dumps(shelves)
 
 
 run(host='localhost', port=8080)
