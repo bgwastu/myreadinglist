@@ -1,18 +1,31 @@
-from bottle import route, run, template
-from requests.api import request
-from config import LIST_URL, DETAIL_URL
-import requests
-from bs4 import BeautifulSoup
 import json
 from datetime import datetime
+
+import requests
+from bottle import request, route, run
+from bs4 import BeautifulSoup
+
+from config import DETAIL_URL, LIST_URL
 
 
 # Get books based on shelf
 # shelf: currently-reading, to-read, read
 @route('/books/shelf/<shelf>')
 def get_books_read(shelf):
-    page = requests.get(LIST_URL, params={'shelf': shelf})
-    soup = BeautifulSoup(page.content, 'html.parser')
+
+    # Check page
+    page = int(request.query.page) or 1
+    body = requests.get(
+        LIST_URL, params={'shelf': shelf, 'page': page, 'print': 'true'})
+    soup = BeautifulSoup(body.content, 'html.parser')
+
+    # Get max page
+    max_page = int(soup.select_one(
+        '.next_page').find_previous_sibling('a').text)
+
+    # Check is page is end by current page > max page
+    if page > max_page:
+        max_page = page
 
     booksRaw = soup.select('tbody#booksBody > tr')
     books = []
@@ -29,28 +42,40 @@ def get_books_read(shelf):
             '.field.date_added > div > span').text.strip()
         detail_url = book.select_one('td.field.title > div > a')['href']
 
-        # get id from detail_url
+        # Get id from detail_url
         id = (detail_url.split('/')[-1]).split('-')[0]
 
+        # Date parsing, parse if date format is like Jan 01, 2002 or if failed like date Jan 2002
         if date_read == 'not set':
             date_read = None
         else:
-            date_read = datetime.strptime(date_read, '%b %d, %Y').isoformat()
+            try:
+                date_read = datetime.strptime(
+                    date_read, '%b %d, %Y').isoformat()
+            except:
+                date_read = datetime.strptime(date_read, '%b %Y').isoformat()
 
         if date_added == 'not set':
             date_added = None
         else:
-            date_added = datetime.strptime(date_added, '%b %d, %Y').isoformat()
-
+            try:
+                date_added = datetime.strptime(
+                    date_added, '%b %d, %Y').isoformat()
+            except:
+                date_added = datetime.strptime(date_added, '%b %Y').isoformat()
         books.append({
-            'id': id,
-            'cover': cover,
-            'title': title,
-            'author': author,
-            'rating': len(rating),
-            'review': review,
-            'date_read': date_read,
-            'date_added': date_added,
+            'current_page': page,
+            'max_page': max_page,
+            'data': {
+                'id': id,
+                'cover': cover,
+                'title': title,
+                'author': author,
+                'rating': len(rating),
+                'review': review,
+                'date_read': date_read,
+                'date_added': date_added,
+            }
         })
 
     return json.dumps(books)
@@ -74,7 +99,6 @@ def get_book_details(book_id):
     pages = int(
         soup.find('span', {'itemprop': 'numberOfPages'}).text.replace(' pages', ''))
 
-    # print to hello.html
     return json.dumps({
         'title': title,
         'author': author,
