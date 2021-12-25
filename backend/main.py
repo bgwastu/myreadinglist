@@ -1,5 +1,5 @@
 from bottle import route, run, template
-from config import URL
+from config import LIST_URL, DETAIL_URL
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -8,9 +8,9 @@ from datetime import datetime
 
 # Get books based on shelf
 # shelf: currently-reading, to-read, read
-@route('/books/<shelf>')
+@route('/books/shelf/<shelf>')
 def get_books_read(shelf):
-    page = requests.get(URL, params={'shelf': shelf})
+    page = requests.get(LIST_URL, params={'shelf': shelf})
     soup = BeautifulSoup(page.content, 'html.parser')
 
     booksRaw = soup.select('tbody#booksBody > tr')
@@ -27,7 +27,7 @@ def get_books_read(shelf):
         date_added = book.select_one(
             '.field.date_added > div > span').text.strip()
         detail_url = book.select_one('td.field.title > div > a')['href']
-        
+
         # get id from detail_url
         id = (detail_url.split('/')[-1]).split('-')[0]
 
@@ -42,7 +42,7 @@ def get_books_read(shelf):
             date_added = datetime.strptime(date_added, '%b %d, %Y').isoformat()
 
         books.append({
-          'id': id,
+            'id': id,
             'cover': cover,
             'title': title,
             'author': author,
@@ -53,6 +53,34 @@ def get_books_read(shelf):
         })
 
     return json.dumps(books)
+
+# Get details of a book, without user info
+
+
+@route('/books/<book_id:re:[0-9]+>')
+def get_book_details(book_id):
+    page = requests.get(DETAIL_URL + book_id)
+    if page.status_code == 404:
+        return json.dumps({'error': 'Book not found'})
+
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    title = soup.select_one('h1#bookTitle').text.strip()
+    author = soup.select_one('.authorName > span').text.strip()
+    description = soup.select(
+        'div#description > span')[-1].get_text('\n').replace('\n', '\n\n')
+    genres = [x.text for x in soup.select('.actionLinkLite.bookPageGenreLink')]
+    pages = int(
+        soup.find('span', {'itemprop': 'numberOfPages'}).text.replace(' pages', ''))
+
+    # print to hello.html
+    return json.dumps({
+        'title': title,
+        'author': author,
+        'description': description,
+        'genres': genres,
+        'pages': pages,
+    })
 
 
 run(host='localhost', port=8080)
