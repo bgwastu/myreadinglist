@@ -1,24 +1,22 @@
 import json
 from datetime import datetime
-
 import requests
 from bottle import request, route, run
 from bs4 import BeautifulSoup
-
 from config import DETAIL_URL, LIST_URL
-
 
 # Get books based on shelf
 # shelf: currently-reading, to-read, read
 @route('/books/shelf/<shelf>')
-def get_books_read(shelf):
+def get_books_shelf(shelf):
 
     # Check page
-    page = int(request.query.page) or 1
+    page = request.query.page or 1
+    page = int(page)
     body = requests.get(
         LIST_URL, params={'shelf': shelf, 'page': page, 'print': 'true'})
     soup = BeautifulSoup(body.content, 'html.parser')
-
+    
     # Get max page
     max_page = int(soup.select_one(
         '.next_page').find_previous_sibling('a').text)
@@ -64,9 +62,6 @@ def get_books_read(shelf):
             except:
                 date_added = datetime.strptime(date_added, '%b %Y').isoformat()
         books.append({
-            'current_page': page,
-            'max_page': max_page,
-            'data': {
                 'id': id,
                 'cover': cover,
                 'title': title,
@@ -75,14 +70,17 @@ def get_books_read(shelf):
                 'review': review,
                 'date_read': date_read,
                 'date_added': date_added,
-            }
         })
 
-    return json.dumps(books)
+    # delete this
+    asd =  json.dumps({
+        'current_page': page,
+        'max_page': max_page,
+        'data': books
+    })
+    return asd
 
 # Get details of a book, without user info
-
-
 @route('/books/<book_id:re:[0-9]+>')
 def get_book_details(book_id):
     page = requests.get(DETAIL_URL + book_id)
@@ -121,5 +119,5 @@ def get_shelves():
 
     return json.dumps(shelves)
 
-
-run(host='localhost', port=8080)
+if __name__ == '__main__':
+    run(host='localhost', port=8080)
