@@ -1,9 +1,15 @@
 import json
 from datetime import datetime
 import requests
-from bottle import request, route, run
+from bottle import request, route, run, static_file
 from bs4 import BeautifulSoup
 from config import DETAIL_URL, LIST_URL
+
+
+@route('/')
+def index():
+    return static_file('index.html', root='./static')
+
 
 # Get books based on shelf
 # shelf: currently-reading, to-read, read
@@ -78,9 +84,8 @@ def get_books_shelf(shelf):
         'data': books
     })
 
+
 # Get details of a book, without user info
-
-
 @route('/books/<book_id:re:[0-9]+>')
 def get_book_details(book_id):
     page = requests.get(DETAIL_URL + book_id)
