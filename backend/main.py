@@ -16,7 +16,7 @@ def get_books_shelf(shelf):
     body = requests.get(
         LIST_URL, params={'shelf': shelf, 'page': page, 'print': 'true'})
     soup = BeautifulSoup(body.content, 'html.parser')
-    
+
     # Get max page
     max_page = int(soup.select_one(
         '.next_page').find_previous_sibling('a').text)
@@ -62,25 +62,25 @@ def get_books_shelf(shelf):
             except:
                 date_added = datetime.strptime(date_added, '%b %Y').isoformat()
         books.append({
-                'id': id,
-                'cover': cover,
-                'title': title,
-                'author': author,
-                'rating': len(rating),
-                'review': review,
-                'date_read': date_read,
-                'date_added': date_added,
+            'id': id,
+            'cover': cover,
+            'title': title,
+            'author': author,
+            'rating': len(rating),
+            'review': review,
+            'date_read': date_read,
+            'date_added': date_added,
         })
 
-    # delete this
-    asd =  json.dumps({
+    return json.dumps({
         'current_page': page,
         'max_page': max_page,
         'data': books
     })
-    return asd
 
 # Get details of a book, without user info
+
+
 @route('/books/<book_id:re:[0-9]+>')
 def get_book_details(book_id):
     page = requests.get(DETAIL_URL + book_id)
@@ -118,6 +118,7 @@ def get_shelves():
     }) for x in soup.find_all('div', class_='userShelf')]
 
     return json.dumps(shelves)
+
 
 if __name__ == '__main__':
     run(host='localhost', port=8080)
