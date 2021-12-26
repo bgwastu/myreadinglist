@@ -1,3 +1,11 @@
+# API Specifications
+| Method | Endpoint             | Description                              |
+|--------|----------------------|------------------------------------------|
+| GET    | /books/shelf/{shelf} | Get list of book based on shelf slug     |
+| GET    | /shelves             | Get list of shelf                        |
+| GET    | /books/{id}          | Get details of a book, without user info |
+
+
 # Quick start
 - Change your Goodreads ID in the `config.py` file
 - Make sure to have pipenv installed, then install the dependencies:
