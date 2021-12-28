@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import os
 import requests
 from bottle import request, route, run, static_file
 from bs4 import BeautifulSoup
@@ -15,7 +16,6 @@ def index():
 # shelf: currently-reading, to-read, read
 @route('/books/shelf/<shelf>')
 def get_books_shelf(shelf):
-
     # Check page
     page = request.query.page or 1
     page = int(page)
@@ -24,8 +24,10 @@ def get_books_shelf(shelf):
     soup = BeautifulSoup(body.content, 'html.parser')
 
     # Get max page
-    max_page = int(soup.select_one(
-        '.next_page').find_previous_sibling('a').text)
+    max_page = 1
+    if soup.select_one('.next_page'):
+        max_page = int(soup.select_one(
+            '.next_page').find_previous_sibling('a').text)
 
     # Check is page is end by current page > max page
     if page > max_page:
@@ -126,4 +128,6 @@ def get_shelves():
 
 
 if __name__ == '__main__':
-    run(host='localhost', port=8080)
+    # Get host and port from environment variable
+    host = os.environ.get('HOST') or '127.0.0.1'
+    run(host=host, port=5000, debug=not host)
