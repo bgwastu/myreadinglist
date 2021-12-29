@@ -1,0 +1,13 @@
+ {
+  "schemaVersion": 2,
+  "dockerfileLines": [
+      "FROM node:17-alpine",
+      "ADD /client /app",
+      "WORKDIR /app",
+      "ENV PATH /app/node_modules/.bin:$PATH",
+      "RUN npm install --silent",
+      "RUN npm install -g serve",
+      "RUN npm run build",
+      "CMD [\"serve\", \"-s\", \"build\"]",
+  ]
+ }
