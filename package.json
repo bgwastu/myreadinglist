@@ -1,0 +1,23 @@
+{
+  "name": "myreadinglist",
+  "version": "1.0.0",
+  "description": "**myreadinglist** is project that will list your reading history _(or any other user)_ from Goodreads and display it.",
+  "scripts": {
+    "init": "cd client && npm install && cd ../api && pip install --user pipenv && pipenv install",
+    "client": "cd client && npm run start",
+    "api": "cd api && pipenv sync && pipenv run npx nodemon main.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bagaswastu/myreadinglist.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bagaswastu/myreadinglist/issues"
+  },
+  "homepage": "https://github.com/bagaswastu/myreadinglist#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

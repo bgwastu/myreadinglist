@@ -7,3 +7,6 @@ This come in handy if you want to show your cool list of books to friends but at
 ## Features
 - List your reading history
 - Get your comments and rating from books you're already read
+
+## Installation
+TODO
