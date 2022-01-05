@@ -4,12 +4,27 @@ import os
 import requests
 from bottle import request, route, run, static_file
 from bs4 import BeautifulSoup
-from config import DETAIL_URL, LIST_URL
+from config import DETAIL_URL, LIST_URL, USER_DETAIL_URL, ID
 
 
 @route('/')
 def index():
     return static_file('index.html', root='./static')
+
+@route('/user-detail')
+def user_detail():
+    body = requests.get(USER_DETAIL_URL)
+    soup = BeautifulSoup(body.content, 'html.parser')
+
+    name = soup.find('h1', {'class': 'userProfileName'}).text.strip()
+    first_name = name.split(' ')[0]
+    last_name = name.split(' ')[-1]
+    
+    return json.dumps({
+        'user_id': ID,
+        'first_name': first_name,
+        'last_name': last_name,
+    })
 
 
 # Get books based on shelf

@@ -4,6 +4,7 @@
 | GET    | /books/shelf/{shelf} | Get list of book based on shelf slug     |
 | GET    | /shelves             | Get list of shelf                        |
 | GET    | /books/{id}          | Get details of a book, without user info |
+| GET    | /user-detail         | Get user detail                          |
 
 
 # Quick start
