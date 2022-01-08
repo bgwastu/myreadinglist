@@ -5,6 +5,7 @@ import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import constants from '../constants';
 
 const MainDrawer = (props) => {
   const { content, userId, mobileOpen, setMobileOpen, window } = props;
@@ -20,7 +21,7 @@ const MainDrawer = (props) => {
 
   const drawerHeader = (
     <>
-      <Link href="/">
+      <Link href="/" style={{textDecoration: 'inherit'}}>
         <Stack
           direction="row"
           alignItems="center"
@@ -56,7 +57,7 @@ const MainDrawer = (props) => {
         }}
       >
         <Typography variant="overline">{'User id: ' + userId}</Typography>
-        <Link sx={{ fontWeight: '600' }} href="#" variant="overline">
+        <Link sx={{ fontWeight: '600' }} href={constants.API_URL} target="_blank" variant="overline">
           API
         </Link>
       </Box>
@@ -73,7 +74,7 @@ const MainDrawer = (props) => {
         keepMounted: true,
       }}
       sx={{
-        'display': { xs: 'block', md: 'none' },
+        display: { xs: 'block', md: 'none' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: drawerWidth,
@@ -92,7 +93,7 @@ const MainDrawer = (props) => {
     <Drawer
       variant="permanent"
       sx={{
-        'display': { xs: 'none', md: 'block' },
+        display: { xs: 'none', md: 'block' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
           width: drawerWidth,
