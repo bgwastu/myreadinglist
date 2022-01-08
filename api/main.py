@@ -2,10 +2,24 @@ import json
 from datetime import datetime
 import os
 import requests
-from bottle import request, route, run, static_file
+from bottle import request, route, run, static_file, response, hook
 from bs4 import BeautifulSoup
 from config import DETAIL_URL, LIST_URL, USER_DETAIL_URL, ID
 
+@route('/<:re:.*>', method='OPTIONS')
+def enable_cors_generic_route():
+    add_cors_headers()
+
+@hook('after_request')
+def enable_cors_after_request_hook():
+    add_cors_headers()
+
+def add_cors_headers():
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = \
+        'GET, POST, PUT, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = \
+        'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
 @route('/')
 def index():
