@@ -5,14 +5,18 @@ import requests
 from bottle import request, route, run, static_file, response, hook
 from bs4 import BeautifulSoup
 from config import DETAIL_URL, LIST_URL, USER_DETAIL_URL, ID
+import re
+
 
 @route('/<:re:.*>', method='OPTIONS')
 def enable_cors_generic_route():
     add_cors_headers()
 
+
 @hook('after_request')
 def enable_cors_after_request_hook():
     add_cors_headers()
+
 
 def add_cors_headers():
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -21,9 +25,11 @@ def add_cors_headers():
     response.headers['Access-Control-Allow-Headers'] = \
         'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
 
+
 @route('/')
 def index():
     return static_file('index.html', root='./static')
+
 
 @route('/user-detail')
 def user_detail():
@@ -33,7 +39,7 @@ def user_detail():
     name = soup.find('h1', {'class': 'userProfileName'}).text.strip()
     first_name = name.split(' ')[0]
     last_name = name.split(' ')[-1]
-    
+
     return json.dumps({
         'user_id': ID,
         'first_name': first_name,
@@ -66,7 +72,8 @@ def get_books_shelf(shelf):
     books = []
 
     for book in booksRaw:
-        cover = book.select('img')[0]['src'].replace('._SY75_', '')
+        cover = re.sub("_(?<=_)[a-zA-Z0-9]+_.", "",
+                       book.select('img')[0]['src'])
         title = book.select_one('.field.title > div > a').attrs['title']
         author = book.select_one('.field.author > div > a').text
         rating = book.find_all('span', class_='staticStar p10')
@@ -98,7 +105,7 @@ def get_books_shelf(shelf):
                     date_added, '%b %d, %Y').isoformat()
             except:
                 date_added = datetime.strptime(date_added, '%b %Y').isoformat()
-        
+
         if review == 'None':
             review = None
 
