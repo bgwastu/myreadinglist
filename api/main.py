@@ -98,6 +98,10 @@ def get_books_shelf(shelf):
                     date_added, '%b %d, %Y').isoformat()
             except:
                 date_added = datetime.strptime(date_added, '%b %Y').isoformat()
+        
+        if review == 'None':
+            review = None
+
         books.append({
             'id': id,
             'cover': cover,
