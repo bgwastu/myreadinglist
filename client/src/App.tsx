@@ -1,5 +1,12 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { FormControl, MenuItem, Select, Stack, Fade } from '@mui/material';
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  Stack,
+  Fade,
+  LinearProgress,
+} from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -193,6 +200,7 @@ function App() {
           {currentShelf?.name}
         </Typography>
       </Toolbar>
+      <LinearProgress sx={{ visibility: isLoading ? 'visible' : 'hidden' }} />
     </AppBar>
   );
 
