@@ -6,9 +6,10 @@ import {
   Stack,
   Fade,
   LinearProgress,
+  Grid,
+  Box,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,6 +18,8 @@ import React, { useEffect, useState } from 'react';
 import Drawer from './components/Drawer';
 import SplashScreen from './components/SplashScreen';
 import constants from './constants';
+import BookContainer from './components/BookContainer';
+import NoBookScreen from './components/NoBookScreen';
 
 interface Shelf {
   name: string;
@@ -98,20 +101,38 @@ function App() {
     }
   }, [currentShelf]);
 
-  const mainContent = (
-    <Box
-      sx={{
-        px: 2,
-        py: 2,
-      }}
-    >
-      {listBook !== undefined ? (
-        listBook.map((book) => <Box key={book.id}>{book.title}</Box>)
-      ) : (
-        <></>
-      )}
-    </Box>
-  );
+  const mainContent = () => {
+    if (listBook === undefined) {
+      return <></>;
+    }
+    if (listBook.length > 0) {
+      return (
+        <Fade in={!isLoading}>
+          <Grid
+            container
+            sx={{
+              px: 6,
+              py: 3,
+              display: 'flex',
+              justifyContent: {
+                xs: 'center',
+                lg: 'flex-start',
+              },
+            }}
+            gap={2}
+          >
+            {listBook?.map((book) => (
+              <Grid item sx={{ maxWidth: '150px' }}>
+                <BookContainer {...book} />
+              </Grid>
+            ))}
+          </Grid>
+        </Fade>
+      );
+    } else {
+      return <NoBookScreen />;
+    }
+  };
 
   const drawerContent = (
     <Stack
@@ -218,20 +239,21 @@ function App() {
           setMobileOpen={setMobileOpen}
           userId={userDetail?.user_id}
         />
-        <Box
-          component="main"
+        <Stack
+          direction="column"
+          justifyContent="flex-start"
+          alignItems="stretch"
           sx={{
             width: { md: `calc(100% - ${drawerWidth}px)` },
-            display: 'flex',
-            flexDirection: 'column',
+            height: '90vh',
             mt: {
               md: 8,
             },
           }}
         >
           {appBar}
-          {mainContent}
-        </Box>
+          {mainContent()}
+        </Stack>
       </Box>
     </Fade>
   );
