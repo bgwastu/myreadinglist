@@ -8,6 +8,7 @@ import {
   LinearProgress,
   Grid,
   Box,
+  Pagination,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -38,6 +39,12 @@ interface Book {
   date_added: Date;
 }
 
+interface BookResponse {
+  current_page: number;
+  max_page: number;
+  data: Book[];
+}
+
 interface UserDetail {
   user_id: string;
   first_name: string;
@@ -50,16 +57,74 @@ function App() {
 
   const [shelves, setShelves] = useState<Shelf[]>();
   const [currentShelf, setCurrentShelf] = useState<Shelf>();
-  const [listBook, setListBook] = useState<Book[]>();
+  const [bookResponse, setBookResponse] = useState<BookResponse>();
   const [isLoading, setIsLoading] = useState(false);
   const [isInitial, setIsInitial] = useState(true);
   const [userDetail, setUserDetail] = useState<UserDetail>();
 
+  const backToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  // Fetch requested page number
+  function gotoPage(page: number) {
+    if (currentShelf !== undefined) {
+      // Fetch next book list
+      if (bookResponse !== undefined) {
+        // If the requested page is current page, do nothing
+        if (page === bookResponse.current_page) {
+          return;
+        }
+
+        if (bookResponse.current_page <= bookResponse.max_page) {
+          backToTop();
+          setIsLoading(true);
+          fetch(
+            `${constants.API_URL}/books/shelf/${currentShelf.slug}?page=${page}`
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              setBookResponse(data as BookResponse);
+              setIsLoading(false);
+            });
+        }
+      }
+    }
+  }
+
+  // When current shelf shanged
   useEffect(() => {
+    if (currentShelf !== undefined) {
+      setIsLoading(true);
+      fetch(`${constants.API_URL}/books/shelf/${currentShelf.slug}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setBookResponse(data as BookResponse);
+          setIsLoading(false);
+        });
+    }
+  }, [currentShelf]);
+
+  // Fetch initial data
+  useEffect(() => {
+    fetch(`${constants.API_URL}/shelves`)
+      .then((res) => res.json())
+      .then((data) => {
+        setShelves(data);
+        setCurrentShelf(data[0]);
+      });
+
     fetch(`${constants.API_URL}/user-detail`)
       .then((res) => res.json())
       .then((data) => {
         setUserDetail(data as UserDetail);
+      });
+
+    fetch(`${constants.API_URL}/books/shelf/read`)
+      .then((res) => res.json())
+      .then((data) => {
+        setBookResponse(data as BookResponse);
+        setIsLoading(false);
       });
   }, []);
 
@@ -67,66 +132,70 @@ function App() {
     if (
       shelves !== undefined &&
       currentShelf !== undefined &&
-      listBook !== undefined &&
+      bookResponse !== undefined &&
       userDetail !== undefined
     ) {
       setIsInitial(false);
     }
-  }, [currentShelf, shelves, listBook, userDetail]);
-
-  useEffect(() => {
-    fetch(`${constants.API_URL}/shelves`)
-      .then((res) => res.json())
-      .then((data) => {
-        setShelves(data);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (shelves !== undefined) {
-      setCurrentShelf(shelves[0]);
-    }
-  }, [shelves]);
-
-  // Fetch books
-  useEffect(() => {
-    if (currentShelf !== undefined) {
-      setIsLoading(true);
-      fetch(`${constants.API_URL}/books/shelf/${currentShelf.slug}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setListBook(data.data as Book[]);
-          setIsLoading(false);
-        });
-    }
-  }, [currentShelf]);
+  }, [currentShelf, shelves, bookResponse, userDetail]);
 
   const mainContent = () => {
-    if (listBook === undefined) {
+    if (bookResponse === undefined) {
       return <></>;
     }
-    if (listBook.length > 0) {
+    if (bookResponse.data.length > 0) {
       return (
         <Fade in={!isLoading}>
-          <Grid
-            container
+          <Stack
+            direction="column"
+            justifyContent="flex-start"
+            alignItems="center"
+            gap={2}
             sx={{
-              px: 6,
-              py: 3,
-              display: 'flex',
-              justifyContent: {
-                xs: 'center',
-                lg: 'flex-start',
-              },
+              height: '100vh',
             }}
-            gap={3}
           >
-            {listBook?.map((book) => (
-              <Grid item sx={{ maxWidth: '160px' }}>
-                <BookContainer {...book} />
-              </Grid>
-            ))}
-          </Grid>
+            <Grid
+              container
+              sx={{
+                px: 6,
+                py: 3,
+                flexGrow: 1,
+                display: 'flex',
+                justifyContent: {
+                  xs: 'center',
+                  lg: 'flex-start',
+                },
+              }}
+              gap={3}
+            >
+              {bookResponse.data?.map((book) => (
+                <Grid
+                  item
+                  key={book.id}
+                  sx={{
+                    maxWidth: '160px',
+                    visibility: isLoading ? 'hidden' : 'visible',
+                  }}
+                >
+                  <BookContainer {...book} />
+                </Grid>
+              ))}
+            </Grid>
+            <Box
+              sx={{
+                padding: '16px',
+              }}
+            >
+              <Pagination
+                count={bookResponse.max_page}
+                onChange={(e, page) => {
+                  gotoPage(page);
+                }}
+                color="primary"
+              />
+            </Box>
+          </Stack>
         </Fade>
       );
     } else {
