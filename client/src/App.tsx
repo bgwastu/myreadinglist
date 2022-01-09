@@ -119,10 +119,10 @@ function App() {
                 lg: 'flex-start',
               },
             }}
-            gap={2}
+            gap={3}
           >
             {listBook?.map((book) => (
-              <Grid item sx={{ maxWidth: '150px' }}>
+              <Grid item sx={{ maxWidth: '160px' }}>
                 <BookContainer {...book} />
               </Grid>
             ))}
