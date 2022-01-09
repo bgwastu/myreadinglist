@@ -72,7 +72,7 @@ def get_books_shelf(shelf):
     books = []
 
     for book in booksRaw:
-        cover = re.sub("_(?<=_)[a-zA-Z0-9]+_.", "",
+        cover = re.sub("_(?<=_)[a-zA-Z0-9\_]+_.", "",
                        book.select('img')[0]['src'])
         title = book.select_one('.field.title > div > a').attrs['title']
         author = book.select_one('.field.author > div > a').text
