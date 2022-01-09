@@ -139,7 +139,7 @@ function App() {
             <Grid
               container
               sx={{
-                px: 6,
+                px: 3,
                 py: 3,
                 flexGrow: 1,
                 display: 'flex',
@@ -266,7 +266,7 @@ function App() {
               md: 28,
             },
             ml: {
-              md: 4,
+              lg: 2,
             },
           }}
         >
