@@ -1,14 +1,14 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import {
+  Box,
+  Fade,
   FormControl,
+  Grid,
+  LinearProgress,
   MenuItem,
+  Pagination,
   Select,
   Stack,
-  Fade,
-  LinearProgress,
-  Grid,
-  Box,
-  Pagination,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,40 +16,13 @@ import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
+import BookContainer from './components/BookContainer';
+import BookDetailDialog from './components/BookDetailDialog';
 import Drawer from './components/Drawer';
+import NoBookScreen from './components/NoBookScreen';
 import SplashScreen from './components/SplashScreen';
 import constants from './constants';
-import BookContainer from './components/BookContainer';
-import NoBookScreen from './components/NoBookScreen';
-
-interface Shelf {
-  name: string;
-  slug: string;
-  total: number;
-}
-
-interface Book {
-  id: string;
-  cover: string;
-  title: string;
-  author: string;
-  rating: number;
-  review: string;
-  date_read: Date;
-  date_added: Date;
-}
-
-interface BookResponse {
-  current_page: number;
-  max_page: number;
-  data: Book[];
-}
-
-interface UserDetail {
-  user_id: string;
-  first_name: string;
-  last_name: string;
-}
+import { Book, BookResponse, Shelf, UserDetail } from './interface';
 
 function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -61,6 +34,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitial, setIsInitial] = useState(true);
   const [userDetail, setUserDetail] = useState<UserDetail>();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book>();
 
   const backToTop = () => {
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -139,6 +115,11 @@ function App() {
     }
   }, [currentShelf, shelves, bookResponse, userDetail]);
 
+  function onClickDetail(book: Book) {
+    setIsDialogOpen(true);
+    setSelectedBook(book);
+  }
+
   const mainContent = () => {
     if (bookResponse === undefined) {
       return <></>;
@@ -167,7 +148,7 @@ function App() {
                   lg: 'flex-start',
                 },
               }}
-              gap={3}
+              gap={2}
             >
               {bookResponse.data?.map((book) => (
                 <Grid
@@ -176,7 +157,9 @@ function App() {
                   sx={{
                     maxWidth: '160px',
                     visibility: isLoading ? 'hidden' : 'visible',
+                    cursor: 'pointer',
                   }}
+                  onClick={() => onClickDetail(book)}
                 >
                   <BookContainer {...book} />
                 </Grid>
@@ -299,32 +282,39 @@ function App() {
   }
 
   return (
-    <Fade in={!isInitial}>
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <Drawer
-          content={drawerContent}
-          mobileOpen={mobileOpen}
-          setMobileOpen={setMobileOpen}
-          userId={userDetail?.user_id}
-        />
-        <Stack
-          direction="column"
-          justifyContent="flex-start"
-          alignItems="stretch"
-          sx={{
-            width: { md: `calc(100% - ${drawerWidth}px)` },
-            height: '90vh',
-            mt: {
-              md: 8,
-            },
-          }}
-        >
-          {appBar}
-          {mainContent()}
-        </Stack>
-      </Box>
-    </Fade>
+    <>
+      <Fade in={!isInitial}>
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <Drawer
+            content={drawerContent}
+            mobileOpen={mobileOpen}
+            setMobileOpen={setMobileOpen}
+            userId={userDetail?.user_id}
+          />
+          <Stack
+            direction="column"
+            justifyContent="flex-start"
+            alignItems="stretch"
+            sx={{
+              width: { md: `calc(100% - ${drawerWidth}px)` },
+              height: '90vh',
+              mt: {
+                md: 8,
+              },
+            }}
+          >
+            {appBar}
+            {mainContent()}
+          </Stack>
+        </Box>
+      </Fade>
+      <BookDetailDialog
+        book={selectedBook}
+        isDialogOpen={isDialogOpen}
+        setIsDialogOpen={setIsDialogOpen}
+      />
+    </>
   );
 }
 
