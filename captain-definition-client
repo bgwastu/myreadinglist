@@ -1,14 +1,15 @@
- {
+{
   "schemaVersion": 2,
   "dockerfileLines": [
-      "FROM node:17-alpine",
-      "ADD /client /app",
-      "WORKDIR /app",
-      "ENV PATH /app/node_modules/.bin:$PATH",
-      "RUN npm install --silent",
-      "RUN npm install -g serve",
-      "RUN npm run build",
-      "EXPOSE 3000",
-      "CMD [\"serve\", \"-s\", \"build\"]"
+    "FROM node:17-alpine",
+    "ADD /client /app",
+    "WORKDIR /app",
+    "ENV PATH /app/node_modules/.bin:$PATH",
+    "RUN npm install --silent",
+    "RUN npm install -g serve",
+    "RUN npm run build",
+    "CMD [\"echo\", \"ENV REACT_APP_API_URL https://myreadinglist-api.app.wastu.dev\", \">>\", \".env\"]",
+    "EXPOSE 3000",
+    "CMD [\"serve\", \"-s\", \"build\"]"
   ]
- }
+}
