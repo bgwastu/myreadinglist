@@ -4,7 +4,8 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
-import React from 'react';
+import {apiUrl} from '../config';
+
 const MainDrawer = (props) => {
   const { content, userId, mobileOpen, setMobileOpen, window } = props;
 
@@ -57,7 +58,7 @@ const MainDrawer = (props) => {
         <Typography variant="overline">{'User id: ' + userId}</Typography>
         <Link
           sx={{ fontWeight: '600' }}
-          href={process.env.REACT_APP_API_URL}
+          href={apiUrl}
           target="_blank"
           variant="overline"
         >

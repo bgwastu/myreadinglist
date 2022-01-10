@@ -22,8 +22,7 @@ import Drawer from './components/Drawer';
 import NoBookScreen from './components/NoBookScreen';
 import SplashScreen from './components/SplashScreen';
 import { Book, BookResponse, Shelf, UserDetail } from './interface';
-
-const API_URL = process.env.REACT_APP_API_URL;
+import {apiUrl} from './config';
 
 function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -56,7 +55,7 @@ function App() {
         if (bookResponse.current_page <= bookResponse.max_page) {
           backToTop();
           setIsLoading(true);
-          fetch(`${API_URL}/books/shelf/${currentShelf.slug}?page=${page}`)
+          fetch(`${apiUrl}/books/shelf/${currentShelf.slug}?page=${page}`)
             .then((res) => res.json())
             .then((data) => {
               setBookResponse(data as BookResponse);
@@ -71,7 +70,7 @@ function App() {
   useEffect(() => {
     if (currentShelf !== undefined) {
       setIsLoading(true);
-      fetch(`${API_URL}/books/shelf/${currentShelf.slug}`)
+      fetch(`${apiUrl}/books/shelf/${currentShelf.slug}`)
         .then((res) => res.json())
         .then((data) => {
           setBookResponse(data as BookResponse);
@@ -82,20 +81,20 @@ function App() {
 
   // Fetch initial data
   useEffect(() => {
-    fetch(`${API_URL}/shelves`)
+    fetch(`${apiUrl}/shelves`)
       .then((res) => res.json())
       .then((data) => {
         setShelves(data);
         setCurrentShelf(data[0]);
       });
 
-    fetch(`${API_URL}/user-detail`)
+    fetch(`${apiUrl}/user-detail`)
       .then((res) => res.json())
       .then((data) => {
         setUserDetail(data as UserDetail);
       });
 
-    fetch(`${API_URL}/books/shelf/read`)
+    fetch(`${apiUrl}/books/shelf/read`)
       .then((res) => res.json())
       .then((data) => {
         setBookResponse(data as BookResponse);

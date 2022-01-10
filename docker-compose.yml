@@ -6,7 +6,5 @@ services:
       - "5000:5000"
   client:
     build: /client
-    env_file:
-      - ./client/.env
     ports:
       - "3000:3000"
