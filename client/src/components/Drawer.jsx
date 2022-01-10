@@ -5,8 +5,6 @@ import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import constants from '../constants';
-
 const MainDrawer = (props) => {
   const { content, userId, mobileOpen, setMobileOpen, window } = props;
 
@@ -21,7 +19,7 @@ const MainDrawer = (props) => {
 
   const drawerHeader = (
     <>
-      <Link href="/" style={{textDecoration: 'inherit'}}>
+      <Link href="/" style={{ textDecoration: 'inherit' }}>
         <Stack
           direction="row"
           alignItems="center"
@@ -57,7 +55,12 @@ const MainDrawer = (props) => {
         }}
       >
         <Typography variant="overline">{'User id: ' + userId}</Typography>
-        <Link sx={{ fontWeight: '600' }} href={constants.API_URL} target="_blank" variant="overline">
+        <Link
+          sx={{ fontWeight: '600' }}
+          href={process.env.REACT_APP_API_URL}
+          target="_blank"
+          variant="overline"
+        >
           API
         </Link>
       </Box>
