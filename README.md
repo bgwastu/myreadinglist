@@ -1,10 +1,9 @@
 # MyReadingList
+[UNMAINTAINED]
 
 **MyReadingList** is project that will list your reading history _(or any other user)_ from Goodreads and display it.
 
 This come in handy if you want to show your cool list of books to friends but at the same time you want to manage all your reading activity from Goodreads.
-
-Demo: https://myreadinglist.app.wastu.dev
 
 ![Screenshot](/assets/screenshot.jpg)
 
